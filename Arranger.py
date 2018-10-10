@@ -1,9 +1,11 @@
 from mutagen.easyid3 import EasyID3
 import os
 import shutil
-Path = '/Users/jthong/Desktop/Arranger/01、对你的思念.mp3'
+import re
+Path = '/Users/jthong/Desktop/Mus/gundum/06.TV動画「機動戦士高達SEED HD重制版」ED2「Distance」.mp3'
 Tags = EasyID3(Path)
-print(Tags['album'])
+if not Tags.get('album'):
+    print(Tags)
 
 path = '/Users/jthong/Desktop/Mus'
 filetype ='.mp3'#指定文件类型
@@ -14,21 +16,36 @@ def get_filename(path,filetype):
     for root,dirs,files in os.walk(path):
         for i in files:
             if filetype in i:
+                FileName.append(i)
                 RealPath = os.path.join(root,i)
                 FilePath.append(RealPath)
-    return FilePath  
+    return FilePath, FileName
 
-def FileCopy(SourcePath,TargetPath):    #SourcePath:List, TargetPath = String
+def FileCopy(SourcePath,TargetPath,NameList):    #SourcePath:List, TargetPath = String
+    Count = 0
     for i in SourcePath:
-        Tags = EasyID3(Path)
-        if Tags['album']:
-            PathBuffer = os.path.join(TargetPath,Tags['album'])
+        print('Now:', i)
+        Tags = EasyID3(i)
+        if Tags.get('album'):
+            AlName = Tags['album']
+            Buf = AlName[0]
+            Buf = re.sub(' [\/:*?"<>|]','-',Buf)
+            PathBuffer = os.path.join(TargetPath,Buf)
+            print('Processing',PathBuffer)
             if os.path.exists(PathBuffer):
+                TargetBuffer = os.path.join(PathBuffer,NameList[Count])
+                shutil.copyfile(i,TargetBuffer)
                 #Copy File
             else:
                 os.makedirs(PathBuffer)
+                TargetBuffer = os.path.join(PathBuffer,NameList[Count])
+                shutil.copyfile(i,TargetBuffer)
         else :
+            print('Not Album',i)
             #Doing Nothing
+        Count+=1
+    print(Count)
 
-PathList = get_filename(path,filetype)
-print(EasyID3(PathList[7]))
+PathList , FileNameList= get_filename(path,filetype)
+TargetPath = '/Users/jthong/Desktop/TargetDict'
+FileCopy(PathList,TargetPath,FileNameList)
