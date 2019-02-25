@@ -2,7 +2,6 @@ from mutagen.easyid3 import EasyID3
 import os
 import shutil
 import re
-Path = '/Users/jthong/Desktop/Mus/gundum/06.TV動画「機動戦士高達SEED HD重制版」ED2「Distance」.mp3'
 Tags = EasyID3(Path)
 if not Tags.get('album'):
     print(Tags)
